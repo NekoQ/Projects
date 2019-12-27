@@ -96,6 +96,19 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
+            for num in range(1, 10):
+                if check(num, zeros[i]):
+
+                    board[zeros[i][0]][zeros[i][1]] = num
+
+                    if i < len(zeros) - 1:
+                        solve(i+1)
+                    else:
+                        print_board()
+                        exit()
+                    board[zeros[i][0]][zeros[i][1]] = 0
+
+
             textsurface = myfont.render(str(key_event.key - 48), False, (0, 0, 0))
             y = event.pos[0] // block_size
             x = event.pos[1] // block_size
