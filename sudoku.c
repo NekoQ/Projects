@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+
 
 int board[11][11];
 int qx[3] = {0, 1, -1};
@@ -29,15 +31,8 @@ int main()
             fscanf(b, "%d", &board[i][j]);
         }
     }
-    for (int i = 0; i < 11; i++)
-    {
-        for (int j = 0; j < 11; j++)
-        {
-            printf("%2d ", board[i][j]);
-        }
-        printf("\n");
         
-    }
+  
     solve(1,1);
     
 }
@@ -103,7 +98,7 @@ void solve(int x, int y)
                 if(check_lines(num, x, y) && check_square(num, x, y))
                 {
                     board[x][y] = num;
-                    print_board();
+                    
                     for (int i = 0; i < 3; i++)
                     {
                         solve(x + qx[i], y + qy[i]);

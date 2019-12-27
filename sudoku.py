@@ -96,15 +96,12 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                key_event = pygame.event.wait()
-                key_event = pygame.event.wait()
-                textsurface = myfont.render(str(key_event.key - 48), False, (0, 0, 0))
-                y = event.pos[0] // block_size
-                x = event.pos[1] // block_size
-                pygame.draw.rect(gameDisplay, (255, 255, 255), ((y+0.1)*block_size, (x+0.1)*block_size, block_size-10, block_size-10))
-                gameDisplay.blit(textsurface, ((y+0.36)*(block_size), (x+0.2)*(block_size)))
-                print(event.pos)
+            textsurface = myfont.render(str(key_event.key - 48), False, (0, 0, 0))
+            y = event.pos[0] // block_size
+            x = event.pos[1] // block_size
+            pygame.draw.rect(gameDisplay, (255, 255, 255), ((y+0.1)*block_size, (x+0.1)*block_size, block_size-10, block_size-10))
+            gameDisplay.blit(textsurface, ((y+0.36)*(block_size), (x+0.2)*(block_size)))
+            print(event.pos)
         
 
         pygame.display.update()
