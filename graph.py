@@ -1,11 +1,14 @@
 import pygame
 import random
+import json
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
+
+path = 'C:\\Users\\Marius\\Documents\\'
 
 pygame.init()
 
@@ -15,12 +18,12 @@ screen_height = 600
 screen = pygame.display.set_mode((screen_width, screen_height))
 
 class Node():
-    def __init__(self, number, color):
+    def __init__(self, number, color, pos = (50, 50), radius = 20):
 
         self.number = number
-        self.pos = (50, 50)
-        self.radius = 20
         self.color = color
+        self.pos = pos
+        self.radius = radius
 
         #drawing the node on the screen
         pygame.draw.circle(screen, color, self.pos, self.radius)
@@ -58,7 +61,6 @@ def generateEdges():
                 if not node1 or (node1 and node2):
                     for node in reversed(nodes):
                         if inCircle(node, event):
-                            print(node.number)
                             node1 = node
                             node2 = 0
                             break
@@ -66,7 +68,12 @@ def generateEdges():
                     for node in reversed(nodes):
                         if inCircle(node, event):
                             node2 = node
-                            edgeList.append((node1, node2))
+                            if (node1, node2) in edgeList:
+                                edgeList.remove((node1, node2))
+                            elif (node2, node1) in edgeList:
+                                edgeList.remove((node2, node1))
+                            else:
+                                edgeList.append((node1, node2))
                             drawNodes()
                             break
                 else:
@@ -75,10 +82,46 @@ def generateEdges():
             if event.type == pygame.KEYDOWN and event.unicode == 'e':
                 return
 
+def deleteNode():
+    global edgeList
+    while(1):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for node in nodes:
+                    if inCircle(node, event):
+                        edgeList = [edge for edge in edgeList if not node in edge]
+                        nodes.remove(node)
+                        break
+                drawNodes()
+                    
+            if event.type == pygame.KEYDOWN and event.unicode == 'd':
+                return
 
+def exportNodes(name):
+    allInfo = {}
+    for node in nodes:
+       allInfo[node.number] = {}
+       allInfo[node.number]['pos'] = node.pos
+       allInfo[node.number]['color'] = node.color
+       allInfo[node.number]['radius'] = node.radius
+    allInfo['edges'] = [(edge[0].number, edge[1].number) for edge in edgeList]
+    with open(path + name + '.json', 'w') as file:
+        json.dump(allInfo, file, indent=4)
 
-
-
+def importNodes(name):
+    global edgeList, nodes
+    nodes = []
+    edgeList = []
+    with open(path + name + '.json' , 'r') as f:
+        dictt = json.load(f)
+    for number in dictt:
+        if number == 'edges':
+            edgeList = [(nodes[i[0]-1], nodes[i[1]-1]) for i in dictt[number]]
+            continue
+        nodes.append(Node(int(number), dictt[number]['color'], dictt[number]['pos'], dictt[number]['radius']))
+    drawNodes()
 done = False
 clock = pygame.time.Clock()
 screen.fill(WHITE)
@@ -97,6 +140,12 @@ while not done:
             numberOfNodes += 1
         if event.type == pygame.KEYDOWN and event.unicode == 'e':
             generateEdges()
+        if event.type == pygame.KEYDOWN and event.unicode == 'd':
+            deleteNode()
+        if event.type == pygame.KEYDOWN and event.unicode == 'o':
+            exportNodes('nodesInfo')
+        if event.type == pygame.KEYDOWN and event.unicode == 'i':
+            importNodes('nodesInfo')
         if event.type == pygame.MOUSEMOTION and event.buttons != (1, 0, 0):
             selected = 0
         if event.type == pygame.MOUSEMOTION and event.buttons == (1, 0, 0):
@@ -107,7 +156,6 @@ while not done:
                 for node in reversed(nodes):
                     if inCircle(node, event):
                         selected = 1
-                        print(node.number)
                         node.pos = event.pos
                         drawNodes(node)
                         break
